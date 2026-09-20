@@ -14,6 +14,18 @@ function Ensure-Env {
     }
 }
 
+function Set-DagsterHomeAbsolute {
+    $candidate = $env:DAGSTER_HOME
+    if ([string]::IsNullOrWhiteSpace($candidate)) {
+        $candidate = Join-Path $PSScriptRoot ".dagster_home"
+    } elseif (-not [System.IO.Path]::IsPathRooted($candidate)) {
+        $candidate = Join-Path $PSScriptRoot $candidate
+    }
+    $resolved = [System.IO.Path]::GetFullPath($candidate)
+    New-Item -ItemType Directory -Force -Path $resolved | Out-Null
+    $env:DAGSTER_HOME = $resolved
+}
+
 switch ($Target) {
     "help" {
         Write-Host "Usage: .\make.ps1 sync|test|lint|fmt|dagster|bootstrap|env"
@@ -28,8 +40,7 @@ switch ($Target) {
     "fmt" { uv run ruff format . }
     "dagster" {
         Ensure-Env
-        if (-not $env:DAGSTER_HOME) { $env:DAGSTER_HOME = (Resolve-Path ".\.dagster_home").Path }
-        New-Item -ItemType Directory -Force -Path $env:DAGSTER_HOME | Out-Null
+        Set-DagsterHomeAbsolute
         uv run dagster dev -m orchestration.definitions
     }
     "bootstrap" {
