@@ -1,0 +1,15 @@
+# Phase 7 — point warehouse at object storage (S3/R2). Fill in after provisioning.
+storage:
+  root: ./lake
+  warehouse_root: s3://your-bucket/warehouse
+  catalog_db: catalog/catalog.db
+  layers:
+    bronze: s3://your-bucket/bronze
+    silver: s3://your-bucket/silver
+    gold: s3://your-bucket/gold
+
+duckdb:
+  path: duckdb/lakehouse.duckdb
+
+dagster:
+  module: orchestration.definitions

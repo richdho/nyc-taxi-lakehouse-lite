@@ -1,0 +1,14 @@
+storage:
+  root: ./lake
+  warehouse_root: warehouse
+  catalog_db: catalog/catalog.db
+  layers:
+    bronze: bronze
+    silver: silver
+    gold: gold
+
+duckdb:
+  path: duckdb/lakehouse.duckdb
+
+dagster:
+  module: orchestration.definitions

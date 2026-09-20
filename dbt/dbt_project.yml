@@ -1,0 +1,16 @@
+name: nyc_taxi_lakehouse_lite
+version: 1.0.0
+config-version: 2
+
+profile: nyc_taxi_lakehouse_lite
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  nyc_taxi_lakehouse_lite:
+    gold:
+      +materialized: table
+      +schema: gold

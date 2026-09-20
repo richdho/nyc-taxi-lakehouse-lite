@@ -1,0 +1,13 @@
+---
+description: NYC Taxi Lakehouse Lite — no-Docker stack and phased roadmap
+alwaysApply: true
+---
+
+# NYC Taxi Lakehouse Lite
+
+Lightweight medallion lakehouse on NYC TLC data. **No Docker.** Stack: DuckDB, Polars, pyiceberg, dlt, dbt-duckdb, Dagster, pandera.
+
+- Read `docs/ROADMAP.md` and `docs/PLAN.md` before large changes.
+- Phase 0 is complete; next is Phase 1 (bronze ingestion).
+- Use `lakehouse.config.LakehouseConfig`; data lives under gitignored `./lake/`.
+- Do not add Spark clusters, Airflow, or docker-compose to this repo.

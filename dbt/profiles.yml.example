@@ -1,0 +1,8 @@
+# Copy to ~/.dbt/profiles.yml before Phase 4 (after `uv sync --extra dbt`).
+nyc_taxi_lakehouse_lite:
+  target: local
+  outputs:
+    local:
+      type: duckdb
+      path: ../lake/duckdb/lakehouse.duckdb
+      threads: 4

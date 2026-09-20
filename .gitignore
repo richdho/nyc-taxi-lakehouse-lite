@@ -1,0 +1,33 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+
+# Env & secrets
+.env
+
+# Local lakehouse data (never commit)
+lake/
+data/
+downloads/
+staging/
+
+# dbt
+dbt/target/
+dbt/logs/
+dbt/dbt_packages/
+
+# Dagster
+.tmp_dagster*/
+dagster_home/
+.dagster_home/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
