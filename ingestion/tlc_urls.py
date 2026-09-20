@@ -40,6 +40,9 @@ def iter_months_from_env(
 ) -> list[str]:
     import os
 
+    from lakehouse.config import load_project_env
+
+    load_project_env()
     start_val = start or os.getenv("TLC_YELLOW_START", DEFAULT_YELLOW_START)
     end_val = end or os.getenv("TLC_YELLOW_END", DEFAULT_YELLOW_END)
     return iter_months(start_val, end_val)

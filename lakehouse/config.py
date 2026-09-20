@@ -9,6 +9,33 @@ import yaml
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 PROFILES_DIR = PROJECT_ROOT / "config" / "profiles"
+_ENV_LOADED = False
+
+
+def load_project_env() -> None:
+    """Load ``PROJECT_ROOT/.env`` into ``os.environ`` (existing vars win)."""
+    global _ENV_LOADED
+    if _ENV_LOADED:
+        return
+    env_path = PROJECT_ROOT / ".env"
+    if env_path.is_file():
+        for raw_line in env_path.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#"):
+                continue
+            if line.startswith("export "):
+                line = line[7:].strip()
+            if "=" not in line:
+                continue
+            key, _, value = line.partition("=")
+            key = key.strip()
+            if not key or key in os.environ:
+                continue
+            value = value.strip()
+            if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+                value = value[1:-1]
+            os.environ[key] = value
+    _ENV_LOADED = True
 
 
 @dataclass(frozen=True)
@@ -24,6 +51,7 @@ class LakehouseConfig:
 
     @classmethod
     def from_profile(cls, profile: str | None = None) -> LakehouseConfig:
+        load_project_env()
         name = profile or os.getenv("LAKEHOUSE_PROFILE", "local")
         path = PROFILES_DIR / f"{name}.yaml"
         if not path.is_file():

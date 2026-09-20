@@ -14,6 +14,21 @@ function Ensure-Env {
     }
 }
 
+function Invoke-UvRun {
+    param(
+        [Parameter(ValueFromRemainingArguments = $true)]
+        [string[]]$UvCommand
+    )
+    $uvRun = @("run")
+    if (Test-Path ".env") {
+        $uvRun += @("--env-file", ".env")
+    }
+    & uv @uvRun @UvCommand
+    if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE
+    }
+}
+
 function Set-DagsterHomeAbsolute {
     $candidate = $env:DAGSTER_HOME
     if ([string]::IsNullOrWhiteSpace($candidate)) {
@@ -35,20 +50,20 @@ switch ($Target) {
         Ensure-Env
         uv sync --extra dev
     }
-    "test" { uv run pytest }
-    "lint" { uv run ruff check . }
-    "fmt" { uv run ruff format . }
+    "test" { Invoke-UvRun pytest }
+    "lint" { Invoke-UvRun ruff check . }
+    "fmt" { Invoke-UvRun ruff format . }
     "dagster" {
         Ensure-Env
         Set-DagsterHomeAbsolute
-        uv run dagster dev -m orchestration.definitions
+        Invoke-UvRun dagster dev -m orchestration.definitions
     }
     "bootstrap" {
         Ensure-Env
-        uv run python -c "from lakehouse.config import LakehouseConfig; from lakehouse.iceberg_catalog import prepare_bronze_catalog; c=LakehouseConfig.from_profile(); prepare_bronze_catalog(c); print('lake ready:', c.warehouse_root)"
+        Invoke-UvRun python -c "from lakehouse.config import LakehouseConfig; from lakehouse.iceberg_catalog import prepare_bronze_catalog; c=LakehouseConfig.from_profile(); prepare_bronze_catalog(c); print('lake ready:', c.warehouse_root)"
     }
     "ingest-yellow" {
         Ensure-Env
-        uv run python -c "from lakehouse.config import LakehouseConfig; from ingestion.bronze_yellow import run_bronze_yellow_ingest; c=LakehouseConfig.from_profile(); print(run_bronze_yellow_ingest(c))"
+        Invoke-UvRun python -c "from lakehouse.config import LakehouseConfig; from ingestion.bronze_yellow import run_bronze_yellow_ingest; c=LakehouseConfig.from_profile(); print(run_bronze_yellow_ingest(c))"
     }
 }
