@@ -1,6 +1,6 @@
 param(
     [Parameter(Position = 0)]
-    [ValidateSet("help", "env", "sync", "test", "lint", "fmt", "dagster", "bootstrap")]
+    [ValidateSet("help", "env", "sync", "test", "lint", "fmt", "dagster", "bootstrap", "ingest-yellow")]
     [string]$Target = "help"
 )
 
@@ -28,7 +28,7 @@ function Set-DagsterHomeAbsolute {
 
 switch ($Target) {
     "help" {
-        Write-Host "Usage: .\make.ps1 sync|test|lint|fmt|dagster|bootstrap|env"
+        Write-Host "Usage: .\make.ps1 sync|test|lint|fmt|dagster|bootstrap|ingest-yellow|env"
     }
     "env" { Ensure-Env }
     "sync" {
@@ -45,6 +45,10 @@ switch ($Target) {
     }
     "bootstrap" {
         Ensure-Env
-        uv run python -c "from lakehouse.config import LakehouseConfig; c=LakehouseConfig.from_profile(); c.ensure_directories(); print('lake ready:', c.warehouse_root)"
+        uv run python -c "from lakehouse.config import LakehouseConfig; from lakehouse.iceberg_catalog import prepare_bronze_catalog; c=LakehouseConfig.from_profile(); prepare_bronze_catalog(c); print('lake ready:', c.warehouse_root)"
+    }
+    "ingest-yellow" {
+        Ensure-Env
+        uv run python -c "from lakehouse.config import LakehouseConfig; from ingestion.bronze_yellow import run_bronze_yellow_ingest; c=LakehouseConfig.from_profile(); print(run_bronze_yellow_ingest(c))"
     }
 }

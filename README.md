@@ -26,7 +26,7 @@ uv run pytest
 .\make.ps1 dagster
 ```
 
-Open **http://127.0.0.1:3000** (Dagster UI), materialize the `lakehouse_bootstrap` asset to create `./lake/` directories.
+Open **http://127.0.0.1:3000** (Dagster UI). Materialize **`lakehouse_bootstrap`**, then **`bronze_yellow_taxi`** (default month: 2024-01). Or: `.\make.ps1 ingest-yellow`.
 
 Optional (Phase 4+):
 

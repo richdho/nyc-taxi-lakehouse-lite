@@ -1,7 +1,10 @@
 """Dagster entrypoint — expanded in Phase 3 with partitioned assets."""
 
+import os
+
 from dagster import AssetExecutionContext, Definitions, MaterializeResult, asset
 
+from ingestion.bronze_yellow import run_bronze_yellow_ingest
 from lakehouse.config import LakehouseConfig
 from lakehouse.iceberg_catalog import BRONZE_NAMESPACE, prepare_bronze_catalog
 
@@ -26,4 +29,23 @@ def lakehouse_bootstrap(context: AssetExecutionContext) -> MaterializeResult:
     )
 
 
-defs = Definitions(assets=[lakehouse_bootstrap])
+@asset(deps=[lakehouse_bootstrap])
+def bronze_yellow_taxi(context: AssetExecutionContext) -> MaterializeResult:
+    """Download TLC yellow taxi Parquet and land bronze Iceberg (default: 2024-01)."""
+    cfg = LakehouseConfig.from_profile()
+    force_download = os.getenv("TLC_FORCE_DOWNLOAD", "").lower() in {"1", "true", "yes"}
+    stats = run_bronze_yellow_ingest(cfg, force_download=force_download)
+    context.log.info("Bronze ingest complete: %s", stats)
+    rows_by_month = stats["rows_by_month"]
+    return MaterializeResult(
+        metadata={
+            "table": stats["table"],
+            "table_location": stats["table_location"],
+            "months": ", ".join(stats["months"]),
+            "rows_total": sum(rows_by_month.values()),
+            **{f"rows_{month}": count for month, count in rows_by_month.items()},
+        }
+    )
+
+
+defs = Definitions(assets=[lakehouse_bootstrap, bronze_yellow_taxi])
