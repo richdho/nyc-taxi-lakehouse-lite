@@ -26,7 +26,7 @@ uv run pytest
 .\make.ps1 dagster
 ```
 
-Open **http://127.0.0.1:3000** (Dagster UI). Materialize **`lakehouse_bootstrap`**, then **`bronze_yellow_taxi`** (default month: 2024-01). Or: `.\make.ps1 ingest-yellow`.
+Open **http://127.0.0.1:3000** (Dagster UI). Materialize **`lakehouse_bootstrap`**, then **`bronze_yellow_taxi`**, then **`silver_yellow_taxi`** (default month: 2024-01). Or: `.\make.ps1 ingest-yellow` then `.\make.ps1 silver-yellow`.
 
 Optional (Phase 4+):
 
@@ -43,6 +43,7 @@ uv sync --extra dbt --extra dev
 | `.\make.ps1 lint` | ruff |
 | `.\make.ps1 dagster` | `dagster dev` |
 | `.\make.ps1 bootstrap` | Materialize bootstrap asset via Python |
+| `.\make.ps1 silver-yellow` | Bronze → silver transform |
 
 ## Layout
 

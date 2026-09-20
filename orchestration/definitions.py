@@ -6,7 +6,13 @@ from dagster import AssetExecutionContext, Definitions, MaterializeResult, asset
 
 from ingestion.bronze_yellow import run_bronze_yellow_ingest
 from lakehouse.config import LakehouseConfig
-from lakehouse.iceberg_catalog import BRONZE_NAMESPACE, prepare_bronze_catalog
+from lakehouse.iceberg_catalog import (
+    BRONZE_NAMESPACE,
+    SILVER_NAMESPACE,
+    prepare_bronze_catalog,
+    prepare_silver_catalog,
+)
+from transforms.silver_yellow import run_silver_yellow_transform
 
 
 @asset
@@ -14,9 +20,11 @@ def lakehouse_bootstrap(context: AssetExecutionContext) -> MaterializeResult:
     """Create local lake directories and Iceberg catalog namespace (Phase 0–1)."""
     cfg = LakehouseConfig.from_profile()
     prepare_bronze_catalog(cfg)
+    prepare_silver_catalog(cfg)
     context.log.info(
-        "Lake paths and Iceberg namespace %r ready (profile=%s)",
+        "Lake paths and Iceberg namespaces %r, %r ready (profile=%s)",
         BRONZE_NAMESPACE,
+        SILVER_NAMESPACE,
         cfg.profile,
     )
     return MaterializeResult(
@@ -25,6 +33,7 @@ def lakehouse_bootstrap(context: AssetExecutionContext) -> MaterializeResult:
             "warehouse_root": str(cfg.warehouse_root),
             "catalog_db": str(cfg.catalog_db),
             "bronze_namespace": BRONZE_NAMESPACE,
+            "silver_namespace": SILVER_NAMESPACE,
         }
     )
 
@@ -48,4 +57,30 @@ def bronze_yellow_taxi(context: AssetExecutionContext) -> MaterializeResult:
     )
 
 
-defs = Definitions(assets=[lakehouse_bootstrap, bronze_yellow_taxi])
+@asset(deps=[bronze_yellow_taxi])
+def silver_yellow_taxi(context: AssetExecutionContext) -> MaterializeResult:
+    """Clean bronze yellow taxi trips into validated silver Iceberg."""
+    cfg = LakehouseConfig.from_profile()
+    stats = run_silver_yellow_transform(cfg)
+    context.log.info("Silver transform complete: %s", stats)
+    by_month = stats["stats_by_month"]
+    rows_in = sum(m.get("input_rows", 0) for m in by_month.values())
+    rows_out = sum(m.get("output_rows", 0) for m in by_month.values())
+    rejected = sum(m.get("rejected_rows", 0) for m in by_month.values())
+    return MaterializeResult(
+        metadata={
+            "table": stats["table"],
+            "table_location": stats["table_location"],
+            "months": ", ".join(stats["months"]),
+            "rows_in": rows_in,
+            "rows_out": rows_out,
+            "rows_rejected": rejected,
+            **{
+                f"rejected_{month}": month_stats.get("rejected_rows", 0)
+                for month, month_stats in by_month.items()
+            },
+        }
+    )
+
+
+defs = Definitions(assets=[lakehouse_bootstrap, bronze_yellow_taxi, silver_yellow_taxi])

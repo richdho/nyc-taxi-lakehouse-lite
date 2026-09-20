@@ -38,9 +38,9 @@ flowchart LR
 
 ### Phase 2 — Silver
 
-- [ ] Polars/DuckDB cleaning pipeline
-- [ ] pandera schema + range checks
-- [ ] Iceberg schema evolution example
+- [x] Polars/DuckDB cleaning pipeline
+- [x] pandera schema + range checks
+- [x] Iceberg schema evolution example
 
 ### Phase 3 — Incremental
 

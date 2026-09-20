@@ -11,6 +11,7 @@ from lakehouse.config import LakehouseConfig
 
 CATALOG_NAME = "lakehouse"
 BRONZE_NAMESPACE = "bronze"
+SILVER_NAMESPACE = "silver"
 
 
 def sqlite_uri(db_path: Path) -> str:
@@ -52,4 +53,11 @@ def prepare_bronze_catalog(cfg: LakehouseConfig) -> Catalog:
     """Ensure lake directories, catalog DB, and the bronze namespace exist."""
     catalog = load_catalog_from_config(cfg)
     ensure_namespace(catalog, BRONZE_NAMESPACE)
+    return catalog
+
+
+def prepare_silver_catalog(cfg: LakehouseConfig) -> Catalog:
+    """Ensure lake directories, catalog DB, and the silver namespace exist."""
+    catalog = load_catalog_from_config(cfg)
+    ensure_namespace(catalog, SILVER_NAMESPACE)
     return catalog
