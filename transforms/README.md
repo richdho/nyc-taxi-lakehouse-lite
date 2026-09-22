@@ -12,6 +12,16 @@ Same month range as bronze (`TLC_YELLOW_START` / `TLC_YELLOW_END` in `.env`):
 
 Or in Dagster: materialize **`silver_yellow_taxi`** (depends on **`bronze_yellow_taxi`**).
 
+After a successful silver run, **`silver_yellow_taxi_trips`** is registered in
+`lake/duckdb/lakehouse.duckdb` (Iceberg scan view). Query example:
+
+```bash
+uv run duckdb lake/duckdb/lakehouse.duckdb -c \
+  "SELECT trip_month, COUNT(*) FROM silver_yellow_taxi_trips GROUP BY 1"
+```
+
+Re-register only: `make register-silver-duckdb` or `.\make.ps1 register-silver-duckdb`.
+
 ## Idempotent re-runs
 
 Re-running a month **deletes that `trip_month` partition** in silver, then appends freshly cleaned rows.
