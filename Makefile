@@ -1,7 +1,7 @@
-.PHONY: help sync test lint fmt dagster bootstrap
+.PHONY: help sync test lint fmt dagster bootstrap register-silver-duckdb
 
 help:
-	@echo "Targets: sync, test, lint, fmt, dagster, bootstrap"
+	@echo "Targets: sync, test, lint, fmt, dagster, bootstrap, register-silver-duckdb"
 
 sync:
 	uv sync --extra dev
@@ -21,3 +21,6 @@ dagster:
 
 bootstrap:
 	uv run python -c "from lakehouse.config import LakehouseConfig; c=LakehouseConfig.from_profile(); c.ensure_directories(); print('lake ready', c.warehouse_root)"
+
+register-silver-duckdb:
+	uv run python -c "from lakehouse.config import LakehouseConfig; from lakehouse.duckdb_views import register_silver_yellow_duckdb; c=LakehouseConfig.from_profile(); print(register_silver_yellow_duckdb(c))"
