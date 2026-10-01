@@ -18,6 +18,7 @@ from ingestion.bronze_yellow import TABLE_IDENTIFIER as BRONZE_TABLE_ID
 from ingestion.bronze_yellow import YELLOW_TAXI_TABLE
 from ingestion.tlc_urls import iter_months_from_env
 from lakehouse.config import LakehouseConfig
+from lakehouse.duckdb_views import register_silver_yellow_duckdb
 from lakehouse.iceberg_catalog import (
     SILVER_NAMESPACE,
     prepare_bronze_catalog,
@@ -51,12 +52,17 @@ def run_silver_yellow_transform(
         )
         month_stats[month] = stats
 
-    return {
+    result: dict[str, Any] = {
         "months": months,
         "stats_by_month": month_stats,
         "table": ".".join(SILVER_TABLE_ID),
         "table_location": str(table_location),
     }
+    try:
+        result["duckdb"] = register_silver_yellow_duckdb(cfg)
+    except FileNotFoundError:
+        pass
+    return result
 
 
 def _read_bronze_month(catalog: Catalog, month: str) -> pa.Table:

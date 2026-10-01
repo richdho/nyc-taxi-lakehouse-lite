@@ -67,20 +67,23 @@ def silver_yellow_taxi(context: AssetExecutionContext) -> MaterializeResult:
     rows_in = sum(m.get("input_rows", 0) for m in by_month.values())
     rows_out = sum(m.get("output_rows", 0) for m in by_month.values())
     rejected = sum(m.get("rejected_rows", 0) for m in by_month.values())
-    return MaterializeResult(
-        metadata={
-            "table": stats["table"],
-            "table_location": stats["table_location"],
-            "months": ", ".join(stats["months"]),
-            "rows_in": rows_in,
-            "rows_out": rows_out,
-            "rows_rejected": rejected,
-            **{
-                f"rejected_{month}": month_stats.get("rejected_rows", 0)
-                for month, month_stats in by_month.items()
-            },
-        }
-    )
+    metadata: dict[str, object] = {
+        "table": stats["table"],
+        "table_location": stats["table_location"],
+        "months": ", ".join(stats["months"]),
+        "rows_in": rows_in,
+        "rows_out": rows_out,
+        "rows_rejected": rejected,
+        **{
+            f"rejected_{month}": month_stats.get("rejected_rows", 0)
+            for month, month_stats in by_month.items()
+        },
+    }
+    duckdb_info = stats.get("duckdb")
+    if duckdb_info:
+        metadata["duckdb_path"] = duckdb_info["duckdb_path"]
+        metadata["duckdb_view"] = duckdb_info["view"]
+    return MaterializeResult(metadata=metadata)
 
 
 defs = Definitions(assets=[lakehouse_bootstrap, bronze_yellow_taxi, silver_yellow_taxi])

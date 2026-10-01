@@ -1,6 +1,6 @@
 param(
     [Parameter(Position = 0)]
-    [ValidateSet("help", "env", "sync", "test", "lint", "fmt", "dagster", "bootstrap", "ingest-yellow", "silver-yellow")]
+    [ValidateSet("help", "env", "sync", "test", "lint", "fmt", "dagster", "bootstrap", "ingest-yellow", "silver-yellow", "register-silver-duckdb")]
     [string]$Target = "help"
 )
 
@@ -43,7 +43,7 @@ function Set-DagsterHomeAbsolute {
 
 switch ($Target) {
     "help" {
-        Write-Host "Usage: .\make.ps1 sync|test|lint|fmt|dagster|bootstrap|ingest-yellow|silver-yellow|env"
+        Write-Host "Usage: .\make.ps1 sync|test|lint|fmt|dagster|bootstrap|ingest-yellow|silver-yellow|register-silver-duckdb|env"
     }
     "env" { Ensure-Env }
     "sync" {
@@ -69,5 +69,9 @@ switch ($Target) {
     "silver-yellow" {
         Ensure-Env
         Invoke-UvRun python -c "from lakehouse.config import LakehouseConfig; from transforms.silver_yellow import run_silver_yellow_transform; c=LakehouseConfig.from_profile(); print(run_silver_yellow_transform(c))"
+    }
+    "register-silver-duckdb" {
+        Ensure-Env
+        Invoke-UvRun python -c "from lakehouse.config import LakehouseConfig; from lakehouse.duckdb_views import register_silver_yellow_duckdb; c=LakehouseConfig.from_profile(); print(register_silver_yellow_duckdb(c))"
     }
 }

@@ -34,16 +34,20 @@ Optional (Phase 4+):
 uv sync --extra dbt --extra dev
 ```
 
-## Commands (Windows)
+## Commands
+
+Use `make <target>` on Linux/macOS/cloud, or `.\make.ps1 <target>` on Windows.
 
 | Command | Action |
 |---------|--------|
-| `.\make.ps1 sync` | Install/update dependencies |
-| `.\make.ps1 test` | pytest |
-| `.\make.ps1 lint` | ruff |
-| `.\make.ps1 dagster` | `dagster dev` |
-| `.\make.ps1 bootstrap` | Materialize bootstrap asset via Python |
-| `.\make.ps1 silver-yellow` | Bronze → silver transform |
+| `sync` | Install/update dependencies |
+| `test` | pytest |
+| `lint` | ruff |
+| `dagster` | `dagster dev` |
+| `bootstrap` | Lake dirs + Iceberg bronze catalog |
+| `ingest-yellow` | TLC download → bronze Iceberg |
+| `silver-yellow` | Bronze → silver transform |
+| `register-silver-duckdb` | Refresh DuckDB view over silver Iceberg |
 
 ## Layout
 
