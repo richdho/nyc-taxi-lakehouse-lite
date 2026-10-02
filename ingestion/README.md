@@ -15,7 +15,7 @@
 .\make.ps1 ingest-yellow
 ```
 
-Or in Dagster: materialize **`lakehouse_bootstrap`**, then **`bronze_yellow_taxi`**.
+Or in Dagster: materialize **`lakehouse_bootstrap`**, then materialize **`bronze_yellow_taxi`** / **`silver_yellow_taxi`** for a **month partition** (e.g. `2024-01`).
 
 ## Idempotent re-runs
 

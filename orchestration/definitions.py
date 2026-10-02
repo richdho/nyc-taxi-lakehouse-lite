@@ -1,10 +1,17 @@
-"""Dagster entrypoint — expanded in Phase 3 with partitioned assets."""
+"""Dagster entrypoint — monthly partitioned bronze/silver yellow taxi assets."""
 
 import os
 
-from dagster import AssetExecutionContext, Definitions, MaterializeResult, asset
+from dagster import (
+    AssetExecutionContext,
+    Definitions,
+    MaterializeResult,
+    MonthlyPartitionsDefinition,
+    asset,
+)
 
 from ingestion.bronze_yellow import run_bronze_yellow_ingest
+from ingestion.tlc_urls import DEFAULT_YELLOW_START
 from lakehouse.config import LakehouseConfig
 from lakehouse.iceberg_catalog import (
     BRONZE_NAMESPACE,
@@ -13,6 +20,13 @@ from lakehouse.iceberg_catalog import (
     prepare_silver_catalog,
 )
 from transforms.silver_yellow import run_silver_yellow_transform
+
+# Partition keys match Iceberg ``trip_month`` (``YYYY-MM``). ``end_date`` is exclusive.
+YELLOW_TAXI_MONTHLY_PARTITIONS = MonthlyPartitionsDefinition(
+    start_date=DEFAULT_YELLOW_START,
+    end_date="2026-01",
+    fmt="%Y-%m",
+)
 
 
 @asset
@@ -38,46 +52,45 @@ def lakehouse_bootstrap(context: AssetExecutionContext) -> MaterializeResult:
     )
 
 
-@asset(deps=[lakehouse_bootstrap])
+@asset(deps=[lakehouse_bootstrap], partitions_def=YELLOW_TAXI_MONTHLY_PARTITIONS)
 def bronze_yellow_taxi(context: AssetExecutionContext) -> MaterializeResult:
-    """Download TLC yellow taxi Parquet and land bronze Iceberg (default: 2024-01)."""
+    """Download TLC yellow taxi Parquet for one month and land bronze Iceberg."""
+    trip_month = context.partition_key
     cfg = LakehouseConfig.from_profile()
     force_download = os.getenv("TLC_FORCE_DOWNLOAD", "").lower() in {"1", "true", "yes"}
-    stats = run_bronze_yellow_ingest(cfg, force_download=force_download)
-    context.log.info("Bronze ingest complete: %s", stats)
+    stats = run_bronze_yellow_ingest(
+        cfg,
+        start=trip_month,
+        end=trip_month,
+        force_download=force_download,
+    )
+    context.log.info("Bronze ingest complete for %s: %s", trip_month, stats)
     rows_by_month = stats["rows_by_month"]
     return MaterializeResult(
         metadata={
+            "trip_month": trip_month,
             "table": stats["table"],
             "table_location": stats["table_location"],
-            "months": ", ".join(stats["months"]),
-            "rows_total": sum(rows_by_month.values()),
-            **{f"rows_{month}": count for month, count in rows_by_month.items()},
+            "rows": rows_by_month.get(trip_month, 0),
         }
     )
 
 
-@asset(deps=[bronze_yellow_taxi])
+@asset(deps=[bronze_yellow_taxi], partitions_def=YELLOW_TAXI_MONTHLY_PARTITIONS)
 def silver_yellow_taxi(context: AssetExecutionContext) -> MaterializeResult:
-    """Clean bronze yellow taxi trips into validated silver Iceberg."""
+    """Clean bronze yellow taxi trips for one month into validated silver Iceberg."""
+    trip_month = context.partition_key
     cfg = LakehouseConfig.from_profile()
-    stats = run_silver_yellow_transform(cfg)
-    context.log.info("Silver transform complete: %s", stats)
-    by_month = stats["stats_by_month"]
-    rows_in = sum(m.get("input_rows", 0) for m in by_month.values())
-    rows_out = sum(m.get("output_rows", 0) for m in by_month.values())
-    rejected = sum(m.get("rejected_rows", 0) for m in by_month.values())
+    stats = run_silver_yellow_transform(cfg, start=trip_month, end=trip_month)
+    context.log.info("Silver transform complete for %s: %s", trip_month, stats)
+    month_stats = stats["stats_by_month"].get(trip_month, {})
     metadata: dict[str, object] = {
+        "trip_month": trip_month,
         "table": stats["table"],
         "table_location": stats["table_location"],
-        "months": ", ".join(stats["months"]),
-        "rows_in": rows_in,
-        "rows_out": rows_out,
-        "rows_rejected": rejected,
-        **{
-            f"rejected_{month}": month_stats.get("rejected_rows", 0)
-            for month, month_stats in by_month.items()
-        },
+        "rows_in": month_stats.get("input_rows", 0),
+        "rows_out": month_stats.get("output_rows", 0),
+        "rows_rejected": month_stats.get("rejected_rows", 0),
     }
     duckdb_info = stats.get("duckdb")
     if duckdb_info:
