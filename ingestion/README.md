@@ -17,6 +17,12 @@
 
 Or in Dagster: materialize **`lakehouse_bootstrap`**, then materialize **`bronze_yellow_taxi`** / **`silver_yellow_taxi`** for a **month partition** (e.g. `2024-01`).
 
+## Backfill
+
+Dagster partitions run from **`2024-01`** through **`2025-12`**. Materialize the months you want on **`bronze_yellow_taxi`**, then **`silver_yellow_taxi`**.
+
+For the CLI, set `TLC_YELLOW_START` and `TLC_YELLOW_END` (inclusive) and run `.\make.ps1 ingest-yellow`, then `.\make.ps1 silver-yellow`. The default range is a single month.
+
 ## Idempotent re-runs
 
 Re-running the same month **deletes that `trip_month` partition** in Iceberg, then appends fresh data. Row counts for that month should not double.

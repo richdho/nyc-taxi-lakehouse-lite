@@ -30,28 +30,28 @@ flowchart LR
 - [x] dbt project skeleton
 - [x] GitHub Actions CI
 
-### Phase 1 — Bronze
+### Phase 1 — Bronze (done)
 
-- [ ] dlt source for NYC TLC yellow taxi (1–2 years)
-- [ ] pyiceberg table + partitioning (e.g. by month)
-- [ ] Idempotent re-runs documented
+- [x] TLC yellow download helper and dlt source (`ingestion/tlc_yellow_dlt.py`); CLI default month `2024-01`
+- [x] pyiceberg `bronze.yellow_taxi_trips`, identity-partitioned on `trip_month`
+- [x] Idempotent re-runs documented (`ingestion/README.md`)
 
-### Phase 2 — Silver
+### Phase 2 — Silver (done)
 
-- [x] Polars/DuckDB cleaning pipeline
+- [x] Polars cleaning pipeline (`transforms/yellow_taxi_clean.py`)
 - [x] pandera schema + range checks
-- [x] Iceberg schema evolution example
+- [x] Iceberg schema evolution (`pickup_date`, `_silver_version`)
 
-### Phase 3 — Incremental
+### Phase 3 — Incremental (done)
 
-- [ ] Monthly partitions in Dagster
-- [ ] pyiceberg upserts / merge pattern
-- [ ] Backfill runbook
+- [x] Dagster monthly partitions `2024-01` through `2025-12` on bronze and silver
+- [x] Month replace: delete that `trip_month`, then append (bronze and silver)
+- [x] Backfill by materializing Dagster partitions, or `TLC_YELLOW_START` / `TLC_YELLOW_END` (`ingestion/README.md`)
 
-### Phase 4 — Gold
+### Phase 4 — Gold (done)
 
 - [x] `fact_trips`, `dim_zone`, `dim_date`
-- [x] dbt tests + `dbt docs generate`
+- [x] dbt tests + `dbt docs generate` (`.\make.ps1 dbt-gold`)
 
 ### Phase 5 — Tuning
 

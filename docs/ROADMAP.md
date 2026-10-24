@@ -2,7 +2,7 @@
 
 **Source of truth** for this repository. In Agent chat: `@docs/ROADMAP.md`.
 
-**Status:** Phase 0 complete. **Next:** Phase 1 (bronze ingestion with dlt + pyiceberg).
+**Status:** Phases 0–4 complete (scaffold, bronze, silver, monthly partitions, gold marts). **Next:** Phase 5 (tuning).
 
 ## Goal
 
@@ -28,7 +28,7 @@ Medallion **lakehouse** on NYC TLC trip data for senior data-engineering skills 
 | 0 | Scaffold | uv project, config profiles, Dagster bootstrap asset, CI |
 | 1 | Bronze | dlt → partitioned Iceberg bronze |
 | 2 | Silver | Clean + pandera contracts |
-| 3 | Incremental | pyiceberg upserts, Dagster partitions/backfill |
+| 3 | Incremental | Dagster monthly partitions; replace a `trip_month` then append |
 | 4 | Gold | dbt-duckdb star schema + tests/docs |
 | 5 | Tuning | Partitioning, file sizing, DuckDB EXPLAIN |
 | 6 | Serving | Dashboard (Evidence/Streamlit) |
@@ -40,7 +40,7 @@ Medallion **lakehouse** on NYC TLC trip data for senior data-engineering skills 
 - `lakehouse/` — shared config
 - `ingestion/`, `transforms/` — pipeline code
 - `orchestration/` — Dagster `definitions.py`
-- `dbt/` — gold models (Phase 4)
+- `dbt/` — gold models (`fact_trips`, `dim_zone`, `dim_date`)
 - `config/profiles/` — `local` / `cloud`
 - `lake/` — local data (gitignored)
 - `docs/PLAN.md` — detailed plan checklist

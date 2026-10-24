@@ -28,10 +28,11 @@ uv run pytest
 
 Open **http://127.0.0.1:3000** (Dagster UI). Materialize **`lakehouse_bootstrap`**, then **`bronze_yellow_taxi`**, then **`silver_yellow_taxi`** (default month: 2024-01). Or: `.\make.ps1 ingest-yellow` then `.\make.ps1 silver-yellow`.
 
-Optional (Phase 4+):
+Gold marts (needs the dbt extra):
 
 ```powershell
 uv sync --extra dbt --extra dev
+.\make.ps1 dbt-gold
 ```
 
 ## Commands
@@ -55,9 +56,9 @@ Use `make <target>` on Linux/macOS/cloud, or `.\make.ps1 <target>` on Windows.
 ```
 lakehouse/          Shared config
 orchestration/      Dagster definitions
-ingestion/          Phase 1+ dlt / Iceberg bronze
-transforms/         Phase 2+ silver
-dbt/                Phase 4+ gold
+ingestion/          TLC download and Iceberg bronze
+transforms/         Silver cleaning and pandera
+dbt/                Gold star schema
 config/profiles/    local.yaml, cloud.yaml
 lake/               Local warehouse (gitignored)
 docs/               ROADMAP + PLAN
