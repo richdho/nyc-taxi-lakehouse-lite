@@ -1,0 +1,8 @@
+# Repo-local profile (use DBT_PROFILES_DIR=dbt or run via make.ps1 dbt-gold).
+nyc_taxi_lakehouse_lite:
+  target: local
+  outputs:
+    local:
+      type: duckdb
+      path: "{{ env_var('LAKEHOUSE_DUCKDB_PATH', '../lake/duckdb/lakehouse.duckdb') }}"
+      threads: 4

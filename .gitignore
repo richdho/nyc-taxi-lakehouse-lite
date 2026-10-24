@@ -14,12 +14,13 @@ __pycache__/
 lake/
 data/
 downloads/
-staging/
+/staging/
 
 # dbt
 dbt/target/
 dbt/logs/
 dbt/dbt_packages/
+dbt/.user.yml
 
 # Dagster
 .tmp_dagster*/

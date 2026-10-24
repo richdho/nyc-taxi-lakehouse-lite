@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: silver
+    description: Validated yellow taxi trips (DuckDB view over silver Iceberg).
+    schema: main
+    tables:
+      - name: yellow_taxi_trips
+        identifier: silver_yellow_taxi_trips
+        description: One row per trip after Phase 2 cleaning and pandera validation.

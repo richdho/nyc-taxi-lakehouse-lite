@@ -6,11 +6,15 @@ profile: nyc_taxi_lakehouse_lite
 
 model-paths: ["models"]
 macro-paths: ["macros"]
+seed-paths: ["seeds"]
 target-path: "target"
 clean-targets: ["target", "dbt_packages"]
 
 models:
   nyc_taxi_lakehouse_lite:
+    staging:
+      +materialized: view
+      +schema: staging
     gold:
       +materialized: table
       +schema: gold

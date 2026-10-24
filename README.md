@@ -48,6 +48,7 @@ Use `make <target>` on Linux/macOS/cloud, or `.\make.ps1 <target>` on Windows.
 | `ingest-yellow` | TLC download → bronze Iceberg |
 | `silver-yellow` | Bronze → silver transform |
 | `register-silver-duckdb` | Refresh DuckDB view over silver Iceberg |
+| `dbt-gold` | Seed zones, build gold marts, test, generate dbt docs |
 
 ## Layout
 

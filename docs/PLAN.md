@@ -50,8 +50,8 @@ flowchart LR
 
 ### Phase 4 — Gold
 
-- [ ] `fact_trips`, `dim_zone`, `dim_date`
-- [ ] dbt tests + `dbt docs generate`
+- [x] `fact_trips`, `dim_zone`, `dim_date`
+- [x] dbt tests + `dbt docs generate`
 
 ### Phase 5 — Tuning
 

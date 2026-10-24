@@ -1,6 +1,6 @@
 param(
     [Parameter(Position = 0)]
-    [ValidateSet("help", "env", "sync", "test", "lint", "fmt", "dagster", "bootstrap", "ingest-yellow", "silver-yellow", "register-silver-duckdb")]
+    [ValidateSet("help", "env", "sync", "test", "lint", "fmt", "dagster", "bootstrap", "ingest-yellow", "silver-yellow", "register-silver-duckdb", "dbt-gold")]
     [string]$Target = "help"
 )
 
@@ -43,7 +43,7 @@ function Set-DagsterHomeAbsolute {
 
 switch ($Target) {
     "help" {
-        Write-Host "Usage: .\make.ps1 sync|test|lint|fmt|dagster|bootstrap|ingest-yellow|silver-yellow|register-silver-duckdb|env"
+        Write-Host "Usage: .\make.ps1 sync|test|lint|fmt|dagster|bootstrap|ingest-yellow|silver-yellow|register-silver-duckdb|dbt-gold|env"
     }
     "env" { Ensure-Env }
     "sync" {
@@ -73,5 +73,21 @@ switch ($Target) {
     "register-silver-duckdb" {
         Ensure-Env
         Invoke-UvRun python -c "from lakehouse.config import LakehouseConfig; from lakehouse.duckdb_views import register_silver_yellow_duckdb; c=LakehouseConfig.from_profile(); print(register_silver_yellow_duckdb(c))"
+    }
+    "dbt-gold" {
+        Ensure-Env
+        $env:DBT_PROFILES_DIR = Join-Path $PSScriptRoot "dbt"
+        Invoke-UvRun python -c "from lakehouse.config import LakehouseConfig; from lakehouse.duckdb_views import register_silver_yellow_duckdb; register_silver_yellow_duckdb(LakehouseConfig.from_profile())"
+        $duckdbArgs = @("run")
+        if (Test-Path ".env") { $duckdbArgs += @("--env-file", ".env") }
+        $duckdbArgs += @("python", "-c", "from lakehouse.config import LakehouseConfig; print(LakehouseConfig.from_profile().duckdb_path)")
+        $duckdbPath = (& uv @duckdbArgs | Out-String).Trim()
+        $env:LAKEHOUSE_DUCKDB_PATH = $duckdbPath
+        Push-Location (Join-Path $PSScriptRoot "dbt")
+        Invoke-UvRun dbt seed
+        Invoke-UvRun dbt run
+        Invoke-UvRun dbt test
+        Invoke-UvRun dbt docs generate
+        Pop-Location
     }
 }

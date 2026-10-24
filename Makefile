@@ -1,4 +1,4 @@
-.PHONY: help env sync test lint fmt dagster bootstrap ingest-yellow silver-yellow register-silver-duckdb
+.PHONY: help env sync test lint fmt dagster bootstrap ingest-yellow silver-yellow register-silver-duckdb dbt-gold
 
 ifneq (,$(wildcard .env))
 UV_RUN := uv run --env-file .env
@@ -7,7 +7,7 @@ UV_RUN := uv run
 endif
 
 help:
-	@echo "Targets: env, sync, test, lint, fmt, dagster, bootstrap, ingest-yellow, silver-yellow, register-silver-duckdb"
+	@echo "Targets: env, sync, test, lint, fmt, dagster, bootstrap, ingest-yellow, silver-yellow, register-silver-duckdb, dbt-gold"
 
 env:
 	@test -f .env || cp .env.example .env
@@ -39,3 +39,10 @@ silver-yellow: env
 
 register-silver-duckdb: env
 	$(UV_RUN) python -c "from lakehouse.config import LakehouseConfig; from lakehouse.duckdb_views import register_silver_yellow_duckdb; c=LakehouseConfig.from_profile(); print(register_silver_yellow_duckdb(c))"
+
+dbt-gold: env register-silver-duckdb
+	DBT_PROFILES_DIR=$$(pwd)/dbt LAKEHOUSE_DUCKDB_PATH=$$($(UV_RUN) python -c "from lakehouse.config import LakehouseConfig; print(LakehouseConfig.from_profile().duckdb_path)") \
+		$(UV_RUN) dbt seed --project-dir dbt && \
+		$(UV_RUN) dbt run --project-dir dbt && \
+		$(UV_RUN) dbt test --project-dir dbt && \
+		$(UV_RUN) dbt docs generate --project-dir dbt

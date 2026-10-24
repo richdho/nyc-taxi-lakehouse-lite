@@ -1,8 +1,8 @@
-# Copy to ~/.dbt/profiles.yml before Phase 4 (after `uv sync --extra dbt`).
+# Optional: copy to ~/.dbt/profiles.yml. Prefer repo `dbt/profiles.yml` via make.ps1 dbt-gold.
 nyc_taxi_lakehouse_lite:
   target: local
   outputs:
     local:
       type: duckdb
-      path: ../lake/duckdb/lakehouse.duckdb
+      path: "{{ env_var('LAKEHOUSE_DUCKDB_PATH', '../lake/duckdb/lakehouse.duckdb') }}"
       threads: 4
