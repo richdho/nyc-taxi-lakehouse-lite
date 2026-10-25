@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -19,6 +20,7 @@ from ingestion.tlc_yellow_dlt import (
 )
 from lakehouse.config import LakehouseConfig
 from lakehouse.iceberg_catalog import BRONZE_NAMESPACE, prepare_bronze_catalog
+from lakehouse.tuning import append_batches, ensure_write_target
 
 YELLOW_TAXI_TABLE = "yellow_taxi_trips"
 TABLE_IDENTIFIER = (BRONZE_NAMESPACE, YELLOW_TAXI_TABLE)
@@ -90,7 +92,9 @@ def _ensure_yellow_table(
         with txn.update_spec() as spec:
             spec.add_identity("trip_month")
 
-    return catalog.load_table(TABLE_IDENTIFIER)
+    table = catalog.load_table(TABLE_IDENTIFIER)
+    ensure_write_target(table)
+    return table
 
 
 def _replace_month_batches(
@@ -101,8 +105,15 @@ def _replace_month_batches(
     parquet_path: Path,
 ) -> int:
     table.delete(delete_filter=EqualTo("trip_month", month))
+    return append_batches(
+        table,
+        _enriched_batches(parquet_path, month=month, source_url=source_url),
+    )
 
-    total_rows = 0
+
+def _enriched_batches(
+    parquet_path: Path, *, month: str, source_url: str
+) -> Iterator[pa.RecordBatch]:
     for batch in iter_yellow_month_arrow_batches(parquet_path):
         arrow_table = _enrich_batch(
             pa.Table.from_batches([batch]),
@@ -111,9 +122,7 @@ def _replace_month_batches(
         )
         if arrow_table.num_rows == 0:
             continue
-        table.append(arrow_table)
-        total_rows += arrow_table.num_rows
-    return total_rows
+        yield from arrow_table.to_batches()
 
 
 def _enrich_batch(table: pa.Table, *, month: str, source_url: str) -> pa.Table:

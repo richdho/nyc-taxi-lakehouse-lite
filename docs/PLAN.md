@@ -53,10 +53,10 @@ flowchart LR
 - [x] `fact_trips`, `dim_zone`, `dim_date`
 - [x] dbt tests + `dbt docs generate` (`.\make.ps1 dbt-gold`)
 
-### Phase 5 — Tuning
+### Phase 5 — Tuning (done)
 
-- [ ] File size / partition review
-- [ ] Before/after query benchmarks (DuckDB EXPLAIN)
+- [x] File size / partition review (`docs/phase5-tuning.md`: keep `trip_month`, one Parquet file per month)
+- [x] Before/after query benchmarks (DuckDB EXPLAIN)
 
 ### Phase 6 — Serving
 

@@ -1,4 +1,4 @@
-.PHONY: help env sync test lint fmt dagster bootstrap ingest-yellow silver-yellow register-silver-duckdb dbt-gold
+.PHONY: help env sync test lint fmt dagster bootstrap ingest-yellow silver-yellow register-silver-duckdb dbt-gold tune
 
 ifneq (,$(wildcard .env))
 UV_RUN := uv run --env-file .env
@@ -7,7 +7,7 @@ UV_RUN := uv run
 endif
 
 help:
-	@echo "Targets: env, sync, test, lint, fmt, dagster, bootstrap, ingest-yellow, silver-yellow, register-silver-duckdb, dbt-gold"
+	@echo "Targets: env, sync, test, lint, fmt, dagster, bootstrap, ingest-yellow, silver-yellow, register-silver-duckdb, dbt-gold, tune"
 
 env:
 	@test -f .env || cp .env.example .env
@@ -46,3 +46,6 @@ dbt-gold: env register-silver-duckdb
 		$(UV_RUN) dbt run --project-dir dbt && \
 		$(UV_RUN) dbt test --project-dir dbt && \
 		$(UV_RUN) dbt docs generate --project-dir dbt
+
+tune: env
+	$(UV_RUN) python -m lakehouse.tuning

@@ -2,7 +2,7 @@
 
 **Source of truth** for this repository. In Agent chat: `@docs/ROADMAP.md`.
 
-**Status:** Phases 0–4 complete (scaffold, bronze, silver, monthly partitions, gold marts). **Next:** Phase 5 (tuning).
+**Status:** Phases 0–5 complete (scaffold, bronze, silver, monthly partitions, gold marts, file layout + DuckDB EXPLAIN). **Next:** Phase 6 (serving).
 
 ## Goal
 
@@ -44,6 +44,7 @@ Medallion **lakehouse** on NYC TLC trip data for senior data-engineering skills 
 - `config/profiles/` — `local` / `cloud`
 - `lake/` — local data (gitignored)
 - `docs/PLAN.md` — detailed plan checklist
+- `docs/phase5-tuning.md` — file layout and DuckDB EXPLAIN results
 
 ## Decisions
 

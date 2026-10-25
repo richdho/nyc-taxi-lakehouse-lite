@@ -50,6 +50,7 @@ Use `make <target>` on Linux/macOS/cloud, or `.\make.ps1 <target>` on Windows.
 | `silver-yellow` | Bronze → silver transform |
 | `register-silver-duckdb` | Refresh DuckDB view over silver Iceberg |
 | `dbt-gold` | Seed zones, build gold marts, test, generate dbt docs |
+| `tune` | Rewrite multi-file `trip_month` partitions and print DuckDB EXPLAIN |
 
 ## Layout
 

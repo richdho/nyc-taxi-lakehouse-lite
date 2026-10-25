@@ -27,6 +27,8 @@ For the CLI, set `TLC_YELLOW_START` and `TLC_YELLOW_END` (inclusive) and run `.\
 
 Re-running the same month **deletes that `trip_month` partition** in Iceberg, then appends fresh data. Row counts for that month should not double.
 
+Appends are buffered up to the project write target (2 GiB of uncompressed Arrow, about one yellow-taxi month) so a month is not split into one Parquet file per 250k-row batch. `.\make.ps1 tune` rewrites any `trip_month` that still has more than one data file and prints DuckDB `EXPLAIN ANALYZE` for `2024-01`.
+
 Set `TLC_FORCE_DOWNLOAD=1` to re-download Parquet even if a staging file exists.
 
 ## Config
