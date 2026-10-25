@@ -35,6 +35,15 @@ uv sync --extra dbt --extra dev
 .\make.ps1 dbt-gold
 ```
 
+Dashboard on gold marts (Phase 6, Streamlit):
+
+```powershell
+uv sync --extra serving --extra dbt --extra dev
+.\make.ps1 dashboard
+```
+
+Open **http://localhost:8501** after gold is built.
+
 ## Commands
 
 Use `make <target>` on Linux/macOS/cloud, or `.\make.ps1 <target>` on Windows.
@@ -51,6 +60,7 @@ Use `make <target>` on Linux/macOS/cloud, or `.\make.ps1 <target>` on Windows.
 | `register-silver-duckdb` | Refresh DuckDB view over silver Iceberg |
 | `dbt-gold` | Seed zones, build gold marts, test, generate dbt docs |
 | `tune` | Rewrite multi-file `trip_month` partitions and print DuckDB EXPLAIN |
+| `dashboard` | Streamlit UI on dbt gold (`main_gold.fact_trips`, dims; read-only DuckDB) |
 
 ## Layout
 
@@ -60,6 +70,7 @@ orchestration/      Dagster definitions
 ingestion/          TLC download and Iceberg bronze
 transforms/         Silver cleaning and pandera
 dbt/                Gold star schema
+serving/            Streamlit dashboard (Phase 6)
 config/profiles/    local.yaml, cloud.yaml
 lake/               Local warehouse (gitignored)
 docs/               ROADMAP + PLAN

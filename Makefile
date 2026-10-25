@@ -1,4 +1,4 @@
-.PHONY: help env sync test lint fmt dagster bootstrap ingest-yellow silver-yellow register-silver-duckdb dbt-gold tune
+.PHONY: help env sync test lint fmt dagster bootstrap ingest-yellow silver-yellow register-silver-duckdb dbt-gold tune dashboard
 
 ifneq (,$(wildcard .env))
 UV_RUN := uv run --env-file .env
@@ -7,7 +7,7 @@ UV_RUN := uv run
 endif
 
 help:
-	@echo "Targets: env, sync, test, lint, fmt, dagster, bootstrap, ingest-yellow, silver-yellow, register-silver-duckdb, dbt-gold, tune"
+	@echo "Targets: env, sync, test, lint, fmt, dagster, bootstrap, ingest-yellow, silver-yellow, register-silver-duckdb, dbt-gold, tune, dashboard"
 
 env:
 	@test -f .env || cp .env.example .env
@@ -49,3 +49,6 @@ dbt-gold: env register-silver-duckdb
 
 tune: env
 	$(UV_RUN) python -m lakehouse.tuning
+
+dashboard: env
+	$(UV_RUN) streamlit run serving/app.py --server.headless true

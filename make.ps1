@@ -1,6 +1,6 @@
 param(
     [Parameter(Position = 0)]
-    [ValidateSet("help", "env", "sync", "test", "lint", "fmt", "dagster", "bootstrap", "ingest-yellow", "silver-yellow", "register-silver-duckdb", "dbt-gold", "tune")]
+    [ValidateSet("help", "env", "sync", "test", "lint", "fmt", "dagster", "bootstrap", "ingest-yellow", "silver-yellow", "register-silver-duckdb", "dbt-gold", "tune", "dashboard")]
     [string]$Target = "help"
 )
 
@@ -43,7 +43,7 @@ function Set-DagsterHomeAbsolute {
 
 switch ($Target) {
     "help" {
-        Write-Host "Usage: .\make.ps1 sync|test|lint|fmt|dagster|bootstrap|ingest-yellow|silver-yellow|register-silver-duckdb|dbt-gold|tune|env"
+        Write-Host "Usage: .\make.ps1 sync|test|lint|fmt|dagster|bootstrap|ingest-yellow|silver-yellow|register-silver-duckdb|dbt-gold|tune|dashboard|env"
     }
     "env" { Ensure-Env }
     "sync" {
@@ -93,5 +93,9 @@ switch ($Target) {
     "tune" {
         Ensure-Env
         Invoke-UvRun python -m lakehouse.tuning
+    }
+    "dashboard" {
+        Ensure-Env
+        Invoke-UvRun streamlit run serving/app.py
     }
 }

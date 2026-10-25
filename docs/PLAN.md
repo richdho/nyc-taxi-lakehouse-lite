@@ -58,9 +58,9 @@ flowchart LR
 - [x] File size / partition review (`docs/phase5-tuning.md`: keep `trip_month`, one Parquet file per month)
 - [x] Before/after query benchmarks (DuckDB EXPLAIN)
 
-### Phase 6 — Serving
+### Phase 6 — Serving (done)
 
-- [ ] Simple dashboard on gold marts
+- [x] Streamlit dashboard on gold marts (`serving/app.py`, `.\make.ps1 dashboard`)
 
 ### Phase 7 — Cloud (optional)
 

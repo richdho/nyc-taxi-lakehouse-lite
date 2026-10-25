@@ -2,7 +2,7 @@
 
 **Source of truth** for this repository. In Agent chat: `@docs/ROADMAP.md`.
 
-**Status:** Phases 0–5 complete (scaffold, bronze, silver, monthly partitions, gold marts, file layout + DuckDB EXPLAIN). **Next:** Phase 6 (serving).
+**Status:** Phases 0–6 complete through gold serving (Streamlit on `gold.*` marts). **Next:** Phase 7 (cloud, optional) or Phase 8 (polish).
 
 ## Goal
 
@@ -41,6 +41,7 @@ Medallion **lakehouse** on NYC TLC trip data for senior data-engineering skills 
 - `ingestion/`, `transforms/` — pipeline code
 - `orchestration/` — Dagster `definitions.py`
 - `dbt/` — gold models (`fact_trips`, `dim_zone`, `dim_date`)
+- `serving/` — Streamlit dashboard on dbt gold (`make dashboard`)
 - `config/profiles/` — `local` / `cloud`
 - `lake/` — local data (gitignored)
 - `docs/PLAN.md` — detailed plan checklist

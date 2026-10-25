@@ -8,6 +8,6 @@ alwaysApply: true
 Lightweight medallion lakehouse on NYC TLC data. **No Docker.** Stack: DuckDB, Polars, pyiceberg, dlt, dbt-duckdb, Dagster, pandera.
 
 - Read `docs/ROADMAP.md` and `docs/PLAN.md` before large changes.
-- Phases 0–5 are complete; next is Phase 6 (serving: a dashboard on the gold marts).
+- Phases 0–6 are complete; next is Phase 7 (optional cloud) or Phase 8 (polish).
 - Use `lakehouse.config.LakehouseConfig`; data lives under gitignored `./lake/`.
 - Do not add Spark clusters, Airflow, or docker-compose to this repo.
