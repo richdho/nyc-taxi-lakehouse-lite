@@ -4,7 +4,7 @@ Senior-style **medallion lakehouse** learning project without Docker — built f
 
 **Stack:** DuckDB · Polars · Apache Iceberg (pyiceberg) · dlt · dbt-duckdb · Dagster · pandera
 
-Full roadmap: [`docs/ROADMAP.md`](docs/ROADMAP.md) · Checklist: [`docs/PLAN.md`](docs/PLAN.md)
+Full roadmap: [`docs/ROADMAP.md`](docs/ROADMAP.md) · Checklist: [`docs/PLAN.md`](docs/PLAN.md) · Architecture: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 
 > The heavier Docker lab (Spark/Airflow/Trino/MinIO) lives in a separate repo: `nyc-taxi-lakehouse`.
 
@@ -73,7 +73,7 @@ dbt/                Gold star schema
 serving/            Streamlit dashboard (Phase 6)
 config/profiles/    local.yaml, cloud.yaml
 lake/               Local warehouse (gitignored)
-docs/               ROADMAP + PLAN
+docs/               ROADMAP, PLAN, ARCHITECTURE
 ```
 
 ## Open in Cursor

@@ -18,4 +18,5 @@ jobs:
       - run: uv python install 3.11
       - run: uv sync --extra dev --extra dbt
       - run: uv run ruff check .
+      # Critical paths: catalog, silver clean, bronze/silver month replace, dbt gold fixture, serving SQL
       - run: uv run pytest

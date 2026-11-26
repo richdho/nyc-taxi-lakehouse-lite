@@ -69,8 +69,8 @@ flowchart LR
 
 ### Phase 8 — Polish
 
-- [ ] Architecture write-up for interviews
-- [ ] CI coverage for critical paths
+- [x] Architecture write-up for interviews (`docs/ARCHITECTURE.md`)
+- [x] CI coverage for critical paths (bronze/silver month replace in pytest)
 
 ## Senior skills map
 

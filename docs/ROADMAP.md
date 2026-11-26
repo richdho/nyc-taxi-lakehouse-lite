@@ -2,7 +2,7 @@
 
 **Source of truth** for this repository. In Agent chat: `@docs/ROADMAP.md`.
 
-**Status:** Phases 0–6 complete through gold serving (Streamlit on `gold.*` marts). **Next:** Phase 7 (cloud, optional) or Phase 8 (polish).
+**Status:** Phases 0–6 and **Phase 8 (polish)** complete. **Next (optional):** Phase 7 (cloud). Architecture: [`docs/ARCHITECTURE.md`](ARCHITECTURE.md).
 
 ## Goal
 
@@ -45,6 +45,7 @@ Medallion **lakehouse** on NYC TLC trip data for senior data-engineering skills 
 - `config/profiles/` — `local` / `cloud`
 - `lake/` — local data (gitignored)
 - `docs/PLAN.md` — detailed plan checklist
+- `docs/ARCHITECTURE.md` — interview / portfolio architecture write-up
 - `docs/phase5-tuning.md` — file layout and DuckDB EXPLAIN results
 
 ## Decisions
